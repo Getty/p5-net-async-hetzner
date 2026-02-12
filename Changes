@@ -1,0 +1,9 @@
+Revision history for Net-Async-Hetzner
+
+{{$NEXT}}
+    - Initial release
+    - Net::Async::Hetzner::Cloud - async Cloud API client
+    - Net::Async::Hetzner::Robot - async Robot API client
+    - IO::Async integration via IO::Async::Notifier
+    - Future-based async HTTP methods (get, post, put, delete)
+    - Reuses WWW::Hetzner for request building and response parsing
