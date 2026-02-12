@@ -13,7 +13,7 @@ use HTTP::Request;
 use WWW::Hetzner::Cloud;
 use WWW::Hetzner::HTTPResponse;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 sub configure {
     my ($self, %params) = @_;
