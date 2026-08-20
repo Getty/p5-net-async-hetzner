@@ -1,6 +1,6 @@
 ---
 name: hetzner-perl
-description: "WWW::Hetzner + Net::Async::Hetzner — Hetzner Cloud & Robot API clients for Perl"
+description: Use when talking to Hetzner from Perl — WWW::Hetzner or Net::Async::Hetzner, the Cloud API, the Robot API for dedicated servers, or the CLI tools.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
