@@ -1,0 +1,8 @@
+claude: true
+prompt: >
+  Drain the Net-Async-Hetzner karr board. Pick the next actionable ticket, delegate
+  behavior-relevant work to the net-async-hetzner-worker (tests to
+  net-async-hetzner-test-writer, pre-release audit to net-async-hetzner-release-checker),
+  verify with `prove -lr -I../p5-www-hetzner/lib t/`, then hand the ticket to review.
+  Never run `dzil release` or push without explicit instruction; this dist releases
+  together with WWW::Hetzner. Stop when nothing actionable remains.
