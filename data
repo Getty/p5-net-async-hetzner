@@ -1,0 +1,19 @@
+---
+class: standard
+completed: 2026-09-09T10:42:59Z
+created: 2026-09-08T17:34:15Z
+id: 5
+priority: medium
+started: 2026-09-09T10:39:52Z
+status: done
+tags:
+- seam
+- query
+- regression
+title: Query-Kodierung und Mehrfachwerte am WWW-Seam regressionsprüfen
+updated: 2026-09-09T10:42:59Z
+---
+
+Schnittstellenkoordination zu p5-www-hetzner #13, vom Maintainer am 2026-09-08 freigegeben. WWW::Hetzner ergänzt URI-Kodierung von Query-Schlüsseln und -Werten (Unicode/Sonderzeichen) sowie Arrayrefs als wiederholte Parameter. Skalare Aufrufe und _build_request/_parse_response-Signaturen/Objektformen bleiben erhalten. Async-Clients übernehmen Requestbau automatisch. Hier netzfreie Tests des ausgehenden Async-Requests für Filter, Unicode und sort-Mehrfachwerte ergänzen, Mock bei Bedarf anpassen. Keine Cross-Repo-Codeänderung durch die WWW-Abschlusssitzung; kein Release beauftragt.
+
+2026-09-09 10:42 Regression-covered query URI-encoding at the async seam in t/cloud.t: updated existing assertion to label_selector=env%3Dprod; added subtests for Unicode value (name=M%C3%BCnchen) and arrayref repeated params (sort=name%3Aasc and sort=id%3Adesc, no bracket form). No lib change; delegation inherits WWW::Hetzner behavior. Full suite green, 24 tests. Commit 78008ec on branch agent-phase2.
