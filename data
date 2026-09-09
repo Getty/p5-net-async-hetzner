@@ -1,0 +1,18 @@
+---
+class: standard
+completed: 2026-09-09T10:48:54Z
+created: 2026-08-31T04:21:46Z
+id: 2
+priority: low
+started: 2026-09-09T10:46:18Z
+status: done
+tags:
+- release
+- cpanfile
+title: 'cpanfile: declare test-only deps actually used'
+updated: 2026-09-09T10:48:54Z
+---
+
+The `on test` block only requires Test::More, but the test suite also uses HTTP::Response (from HTTP::Message) and IO::Async::Loop / Future at test time. Audit lib/ and t/ use-statements against cpanfile and declare what is missing (runtime vs on test), removing anything dead. Local working-tree version is authoritative; a lagging CPAN WWW::Hetzner is not a blocker.
+
+2026-09-09 10:48 Audited lib/ and t/ use-statements vs cpanfile. Dropped runtime requires IO::Async::Loop (used only in POD SYNOPSIS; umbrella IO::Async 0.80 already supplies the dist at runtime). Added on-test requires for IO::Async::Loop and HTTP::Response (really used by the test suite incl t/lib mock). Carp left undeclared to match sibling WWW::Hetzner no-core convention. dzil test green, 28 tests. Commit 509942d on branch agent-phase2.
