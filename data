@@ -1,0 +1,18 @@
+---
+class: standard
+completed: 2026-09-09T10:50:43Z
+created: 2026-08-31T04:21:50Z
+id: 3
+priority: low
+started: 2026-09-09T10:49:23Z
+status: done
+tags:
+- release
+- docs
+title: Document/verify the WWW::Hetzner joint-release coupling
+updated: 2026-09-09T10:50:43Z
+---
+
+Net::Async::Hetzner reuses WWW::Hetzner private _build_request/_parse_response and must be released together with p5-www-hetzner. Confirm the coupling is captured where a releaser will see it (Changes note and/or a cross-repo karr ticket protocol) so neither dist is ever released alone. Coordination only — no code behavior.
+
+2026-09-09 10:50 Recorded the joint-release coupling durably in Changes as a RELEASE COUPLING header above the version token so a releaser sees it at release time. It points to the protocol already documented in CLAUDE.md and the house rules file, which capture the never-release-alone rule and karr ticket coordination. Docs only, no code behavior. Commit ed32873 on branch agent-phase2.
