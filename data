@@ -1,0 +1,19 @@
+---
+class: standard
+completed: 2026-09-09T10:45:18Z
+created: 2026-09-08T17:34:10Z
+id: 4
+priority: high
+started: 2026-09-09T10:43:28Z
+status: done
+tags:
+- seam
+- robot
+- regression
+title: Robot-Form-Encoding aus WWW::Hetzner übernehmen und regressionsprüfen
+updated: 2026-09-09T10:45:18Z
+---
+
+Schnittstellenkoordination zu p5-www-hetzner #11, vom Maintainer am 2026-09-08 freigegeben. WWW::Hetzner korrigiert Robot-POST-Bodies von JSON auf application/x-www-form-urlencoded einschließlich dokumentierter Arrayfelder. Basic Auth, _build_request/_parse_response-Signaturen und Request-/Response-Objektformen bleiben erhalten. Net::Async::Hetzner delegiert Requestbau an WWW::Hetzner und übernimmt dies automatisch. Hier netzfreie Async-Regressionen am rohen Request und ggf. Mock-Anpassung durchführen; Cloud-JSON unverändert nachweisen. Keine Codeänderung hier durch die WWW-Abschlusssitzung; kein Release beauftragt.
+
+2026-09-09 10:45 Regression-covered Robot form-encoding at the async seam. t/robot.t: POST body is application/x-www-form-urlencoded with arrayref expanded to server[]=11 and server[]=22 (contiguous, ordered) and scalar percent-encoded (name=a%20b), and is not JSON. t/cloud.t: proved Cloud POST stays Content-Type application/json with JSON object body. No lib change; delegation inherits WWW::Hetzner behavior. Full suite green, 25 tests. Commit c5fbeb0 on branch agent-phase2.
