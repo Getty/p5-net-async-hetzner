@@ -1,0 +1,18 @@
+---
+class: standard
+completed: 2026-09-09T10:39:13Z
+created: 2026-08-31T04:21:42Z
+id: 1
+priority: medium
+started: 2026-09-09T10:34:57Z
+status: done
+tags:
+- tests
+- cleanup
+title: Consolidate duplicated Test::MockAsyncHTTP into t/lib helper
+updated: 2026-09-09T10:39:31Z
+---
+
+Both t/cloud.t and t/robot.t define their own in-file Test::MockAsyncHTTP notifier; robot.t guards its copy with an awkward eval q{...} block to avoid redefining the package. Extract a single shared mock (e.g. t/lib/Test/MockAsyncHTTP.pm) that both files use via `use lib "t/lib"`, dropping the duplication and the eval hack. Keep the injection pattern ($client->{_http} = $mock before $loop->add) and the recorded-requests API intact.
+
+2026-09-09 10:39 Done: extracted shared t/lib/Test/MockAsyncHTTP.pm; cloud.t and robot.t load it via use lib t/lib; eval redefine hack removed; injection pattern and requests API unchanged. Verified robot.t and 00-load green, only pre-existing k5 query failure remains. Commit 4029c41 on branch agent-phase2.
