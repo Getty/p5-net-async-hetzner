@@ -1,5 +1,11 @@
 Revision history for Net-Async-Hetzner
 
+RELEASE COUPLING: This distribution reuses WWW::Hetzner's private
+_build_request/_parse_response and MUST be released together with
+WWW::Hetzner (repo p5-www-hetzner). Never release Net-Async-Hetzner
+alone; coordinate both releases through a karr ticket. See CLAUDE.md and
+.claude/rules/net-async-hetzner-rules.md for the protocol.
+
 {{$NEXT}}
     - Robot: get/post/put/delete now check credentials up front and croak
       "No Robot credentials configured" instead of sending empty Basic auth
