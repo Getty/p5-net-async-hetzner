@@ -205,7 +205,48 @@ subtest 'get with query params' => sub {
     $cloud->get('/servers', params => { label_selector => 'env=prod' })->get;
 
     my $req = $mock_http->requests->[0]{request};
-    like($req->uri, qr{label_selector=env%3Dprod}, 'query params in URL');
+    like($req->uri, qr{label_selector=env%3Dprod}, 'query value is URI-encoded');
+};
+
+subtest 'query unicode value encoded' => sub {
+    my $loop = IO::Async::Loop->new;
+
+    my $mock_http = Test::MockAsyncHTTP->new(
+        responses => [{
+            status  => 200,
+            content => '{"servers":[]}',
+        }],
+    );
+
+    my $cloud = Net::Async::Hetzner::Cloud->new(token => 'test-token');
+    $cloud->{_http} = $mock_http;
+    $loop->add($cloud);
+
+    $cloud->get('/servers', params => { name => "M\x{fc}nchen" })->get;
+
+    my $req = $mock_http->requests->[0]{request};
+    like($req->uri, qr{name=M%C3%BCnchen}, 'unicode query value UTF-8 percent-encoded');
+};
+
+subtest 'query arrayref becomes repeated params' => sub {
+    my $loop = IO::Async::Loop->new;
+
+    my $mock_http = Test::MockAsyncHTTP->new(
+        responses => [{
+            status  => 200,
+            content => '{"servers":[]}',
+        }],
+    );
+
+    my $cloud = Net::Async::Hetzner::Cloud->new(token => 'test-token');
+    $cloud->{_http} = $mock_http;
+    $loop->add($cloud);
+
+    $cloud->get('/servers', params => { sort => ['name:asc', 'id:desc'] })->get;
+
+    my $req = $mock_http->requests->[0]{request};
+    like($req->uri, qr{sort=name%3Aasc&sort=id%3Adesc}, 'arrayref -> repeated params');
+    unlike($req->uri, qr{sort%5B%5D}, 'no bracket form for query arrays');
 };
 
 done_testing;
