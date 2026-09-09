@@ -100,6 +100,8 @@ subtest 'async post sends body' => sub {
     is($req->method, 'POST', 'correct HTTP method');
     like($req->content, qr/"name"/, 'request body contains name');
     like($req->content, qr/"server_type"/, 'request body contains server_type');
+    is($req->header('Content-Type'), 'application/json', 'cloud body stays JSON');
+    like($req->content, qr{^\s*\{}, 'cloud body is a JSON object');
 };
 
 subtest 'async put' => sub {

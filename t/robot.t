@@ -108,6 +108,31 @@ subtest 'async post' => sub {
     is($data->{server}{server_name}, 'updated', 'parsed response');
 };
 
+subtest 'robot post body is form-urlencoded' => sub {
+    my $loop = IO::Async::Loop->new;
+
+    my $mock_http = Test::MockAsyncHTTP->new(
+        responses => [{
+            status  => 200,
+            content => '{"server":{"server_number":123}}',
+        }],
+    );
+
+    my $robot = Net::Async::Hetzner::Robot->new(
+        user => 'u', password => 'p',
+    );
+    $robot->{_http} = $mock_http;
+    $loop->add($robot);
+
+    $robot->post('/vswitch/123/server', { server => ['11', '22'], name => 'a b' })->get;
+
+    my $req = $mock_http->requests->[0]{request};
+    is($req->header('Content-Type'), 'application/x-www-form-urlencoded', 'robot body is form-encoded');
+    like($req->content, qr{server%5B%5D=11&server%5B%5D=22}, 'arrayref -> repeated name[] fields, in order');
+    like($req->content, qr{name=a%20b}, 'scalar value percent-encoded');
+    unlike($req->content, qr{^\s*[\{\[]}, 'body is not JSON');
+};
+
 subtest 'async put' => sub {
     my $loop = IO::Async::Loop->new;
 
