@@ -7,7 +7,7 @@ briefing:
   skills:
     - net-async-hetzner-core
     - perl-io-async-future
-    - kanban-issues-karr-cli
+    - kanban-issues-karr-ticket
 ---
 
 You are the net-async-hetzner-test-writer for **Net::Async::Hetzner**.

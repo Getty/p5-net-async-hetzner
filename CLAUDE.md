@@ -17,12 +17,12 @@ principle, the delegation lock and the release rule are in
 |---|---|
 | Implement / refactor / debug behavior-relevant code | `net-async-hetzner-worker` (default) |
 | Write/extend tests | `net-async-hetzner-test-writer` |
-| Pre-release audit | `net-async-hetzner-release-checker` |
+| Commits, `Changes`, card → done, pre-release audit | `net-async-hetzner-release-manager` |
 
 The agents carry their knowledge via `briefing.skills` (see `.claude/agents/`); the main
 agent delegates rather than loading those skills itself. Skill sources live under
 `.claude/skills/` — `net-async-hetzner-core` (this distribution), `perl-io-async-future`,
-`getty-perl-release-author-getty`, `perl-release-dist-ini`, `kanban-issues-karr-cli`.
+`getty-perl-release-author-getty`, `perl-release-dist-ini`, `kanban-issues-karr-coordination`.
 
 Coordination runs on the repo's `karr` board (`karr board`). This distribution is released
 **together with `WWW::Hetzner`** and never on its own; release is never run without the

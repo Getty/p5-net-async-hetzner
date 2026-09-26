@@ -31,7 +31,7 @@ This rule depends on whether the Agent/Task tool is available to you.
 
 - **You can spawn subagents** (orchestrating main agent): Do NOT touch behavior-relevant
   code yourself — delegate to `net-async-hetzner-worker`. Your lane: coordinate, inspect,
-  plan, review diffs, run tests, manage git, edit non-behavioral docs. When in doubt,
+  plan, review diffs, run tests, edit non-behavioral docs. When in doubt,
   delegate. Why: only the `net-async-hetzner-*` agents get their skills force-loaded via
   `briefing.skills`; you get no briefing and would touch internals with too little context.
   Specialist lanes:
@@ -40,7 +40,7 @@ This rule depends on whether the Agent/Task tool is available to you.
   |---|---|
   | Implement / refactor / debug behavior-relevant code | `net-async-hetzner-worker` (default) |
   | Write/extend tests | `net-async-hetzner-test-writer` |
-  | Pre-release audit | `net-async-hetzner-release-checker` |
+  | Commits, `Changes`, card → done, pre-release audit | `net-async-hetzner-release-manager` |
 
 - **You cannot spawn subagents** (you ARE a `net-async-hetzner-*` agent): The delegation
   lock does not apply to you — implement, refactor, debug, and test per these rules.
@@ -49,10 +49,13 @@ Behavior-relevant = runtime behavior, the public API, the async transport seam
 (`_do_request`/`_http`), the WWW::Hetzner delegation, the Future contract, IO::Async
 wiring, error propagation, tests. Pure prose docs, the changelog, and README are not.
 
+**Only `net-async-hetzner-release-manager` commits.** A worker leaves a commit-ready tree and hands its card
+to `review`; you then dispatch `net-async-hetzner-release-manager` to cut the commit and close the card.
+
 ## Coordination — karr board (always in scope)
 
 Ticket coordination is the orchestrating agent's job, so `karr` is always in scope — don't
-invoke the `kanban-issues-karr-cli` skill first, just use it. Git-native kanban; state
+invoke the `kanban-issues-karr-coordination` skill first, just use it. Git-native kanban; state
 lives in `refs/karr/*`; this repo has its own board.
 
 - `karr list --compact` / `karr board` — open work · `karr show ID` — detail
@@ -62,7 +65,7 @@ lives in `refs/karr/*`; this repo has its own board.
 
 A change that needs a different `_build_request`/`_parse_response` shape is owned by
 `WWW::Hetzner`: that is a **ticket on `p5-www-hetzner`'s board**, never a silent cross-repo
-edit — do not touch the neighbour repo. Full command surface: skill `kanban-issues-karr-cli`.
+edit — do not touch the neighbour repo. Full command surface: skill `kanban-issues-karr-coordination`.
 
 **Serialize board mutations when fanning out.** Keep implementation parallel if you like,
 but collect results and then loop `karr move`/`handoff`/`sync` sequentially — N landing at
