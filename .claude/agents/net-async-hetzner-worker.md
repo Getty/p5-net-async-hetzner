@@ -2,7 +2,6 @@
 name: net-async-hetzner-worker
 description: "Default Net::Async::Hetzner worker — implement, refactor, debug and test code in this async IO::Async Hetzner Cloud/Robot client. Owns everything behavior-relevant: the async transport seam (_do_request / _http), the WWW::Hetzner delegation for request building and parsing, the Future-returning verb methods, IO::Async::Notifier wiring. Pre-loaded with all Net::Async::Hetzner conventions and repo specifics. Leaves a commit-ready tree; never commits — commits belong to net-async-hetzner-release-manager."
 model: inherit
-allowed-tools: Read, Edit, Write, Bash, Glob, Grep
 briefing:
   skills:
     - net-async-hetzner-core

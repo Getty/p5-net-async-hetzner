@@ -2,7 +2,6 @@
 name: net-async-hetzner-test-writer
 description: "Write and extend Net::Async::Hetzner tests using the in-file Test::MockAsyncHTTP notifier. Tests NEVER hit the real Hetzner API — always replace $client->{_http} with the mock and queue canned HTTP::Response objects. Use for test additions, regression scaffolding, and debugging via captured HTTP::Request objects."
 model: sonnet
-allowed-tools: Read, Edit, Write, Bash, Glob, Grep
 briefing:
   skills:
     - net-async-hetzner-core
