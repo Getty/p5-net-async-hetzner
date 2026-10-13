@@ -12,7 +12,8 @@ alone; coordinate both releases through a karr ticket. See CLAUDE.md and
     - Cloud/Robot: configure() drops the cached WWW::Hetzner client so new
       token/credentials/base_url take effect
     - cpanfile: require IO::Async::SSL (both default endpoints are https),
-      WWW::Hetzner 0.101
+      WWW::Hetzner 0.102 (the sibling these tests run against)
+    - Net::Async::HTTP is loaded with use instead of a late require
     - POD: Robot post/put are form-encoded, not JSON; document croak on missing credentials
     - Tests: expect URL-encoded query values (label_selector=env%3Dprod)
 

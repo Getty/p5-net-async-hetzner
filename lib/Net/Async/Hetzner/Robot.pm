@@ -10,6 +10,7 @@ use Carp qw(croak);
 use Future;
 use URI;
 use HTTP::Request;
+use Net::Async::HTTP;
 use WWW::Hetzner::Robot;
 use WWW::Hetzner::HTTPResponse;
 
@@ -64,7 +65,6 @@ sub _robot {
 sub _http {
     my ($self) = @_;
     unless ($self->{_http}) {
-        require Net::Async::HTTP;
         $self->{_http} = Net::Async::HTTP->new(
             user_agent => 'Net-Async-Hetzner/' . $VERSION,
             max_connections_per_host => 0,

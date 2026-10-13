@@ -7,7 +7,7 @@ requires 'Future', '0.47';
 requires 'URI';
 requires 'HTTP::Request';
 
-requires 'WWW::Hetzner', '0.101';
+requires 'WWW::Hetzner', '0.102';
 requires 'IO::Async::SSL', '0.12';
 
 on test => sub {
