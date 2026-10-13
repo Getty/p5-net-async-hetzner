@@ -1,0 +1,31 @@
+---
+class: standard
+completed: 2026-10-13T19:50:26Z
+created: 2026-10-06T19:44:37Z
+id: 7
+priority: medium
+started: 2026-10-13T19:50:26Z
+status: done
+tags:
+- bug
+- async
+- drift
+- review-2026-10-06
+title: 'Async Robot never calls _check_auth: missing credentials send ''Basic Og=='
+updated: 2026-10-13T19:50:26Z
+---
+
+`Net::Async::Hetzner::Robot` defines `_check_auth` (`lib/Net/Async/Hetzner/Robot.pm:38`) with the helpful 'No Robot credentials configured' message, but `get`/`post`/`put`/`delete` never call it - they go straight to `$robot->_build_request`. The sync client enforces it with `around _request` (`p5-www-hetzner/lib/WWW/Hetzner/Robot.pm:135-139`), which the async path bypasses. `t/robot.t:67` only calls `_check_auth` directly.
+
+Reproduce without HETZNER_ROBOT_USER/PASSWORD:
+
+    my $r = Net::Async::Hetzner::Robot->new;
+    $r->_robot->_build_request('GET', '/server')->headers->{Authorization}
+    # Basic Og==      (= ':'), plus two 'Use of uninitialized value' warnings from WWW/Hetzner/Robot.pm line 145
+
+The request goes out with empty credentials and comes back as a 401 from Hetzner instead of failing locally. The Cloud twin does croak, because its `token` accessor croaks.
+
+Done when: every Robot verb checks the credentials before building the request (failed Future or croak, consistent with Cloud), with a test through `get`, not through `_check_auth`.
+
+---
+Fleet review 2026-10-06 · kind: bug · confidence: verified
