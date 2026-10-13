@@ -239,7 +239,7 @@ subtest 'get with query params' => sub {
     $cloud->get('/servers', params => { label_selector => 'env=prod' })->get;
 
     my $req = $mock_http->requests->[0]{request};
-    like($req->uri, qr{label_selector=env=prod}, 'query params in URL');
+    like($req->uri, qr{label_selector=env%3Dprod}, 'query params in URL');
 };
 
 done_testing;

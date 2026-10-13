@@ -21,6 +21,8 @@ sub configure {
     $self->{user}     = delete $params{user}     if exists $params{user};
     $self->{password} = delete $params{password} if exists $params{password};
     $self->{base_url} = delete $params{base_url} if exists $params{base_url};
+    # cached sync client holds the old credentials/URL
+    delete $self->{_robot};
 
     $self->SUPER::configure(%params);
 }
@@ -109,6 +111,7 @@ sub _do_request {
 
 sub get {
     my ($self, $path, %params) = @_;
+    $self->_check_auth;
     my $robot = $self->_robot;
     my $req = $robot->_build_request('GET', $path, %params);
     return $self->_do_request($req)->then(sub {
@@ -119,6 +122,7 @@ sub get {
 
 sub post {
     my ($self, $path, $data) = @_;
+    $self->_check_auth;
     my $robot = $self->_robot;
     my $req = $robot->_build_request('POST', $path, body => $data);
     return $self->_do_request($req)->then(sub {
@@ -129,6 +133,7 @@ sub post {
 
 sub put {
     my ($self, $path, $data) = @_;
+    $self->_check_auth;
     my $robot = $self->_robot;
     my $req = $robot->_build_request('PUT', $path, body => $data);
     return $self->_do_request($req)->then(sub {
@@ -139,6 +144,7 @@ sub put {
 
 sub delete {
     my ($self, $path) = @_;
+    $self->_check_auth;
     my $robot = $self->_robot;
     my $req = $robot->_build_request('DELETE', $path);
     return $self->_do_request($req)->then(sub {
@@ -198,15 +204,16 @@ Base URL for the Robot API. Defaults to C<https://robot-ws.your-server.de>.
 
 =method get($path, %params)
 
-Async GET request. Returns a L<Future>.
+Async GET request. Croaks if no credentials are configured. Returns a L<Future>.
 
 =method post($path, \%body)
 
-Async POST request with JSON body. Returns a L<Future>.
+Async POST request. The body is sent form-encoded (as the Robot API expects). Croaks
+if no credentials are configured. Returns a L<Future>.
 
 =method put($path, \%body)
 
-Async PUT request with JSON body. Returns a L<Future>.
+Async PUT request, form-encoded like C<post>. Returns a L<Future>.
 
 =method delete($path)
 

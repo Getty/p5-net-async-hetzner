@@ -68,6 +68,25 @@ subtest 'missing credentials croaks' => sub {
     like($@, qr/No Robot credentials/, 'croaks without credentials');
 };
 
+subtest 'verbs check credentials before building the request' => sub {
+    local $ENV{HETZNER_ROBOT_USER};
+    local $ENV{HETZNER_ROBOT_PASSWORD};
+    my $robot = Net::Async::Hetzner::Robot->new;
+    eval { $robot->get('/server') };
+    like($@, qr/No Robot credentials/, 'get croaks without credentials');
+    eval { $robot->post('/x', {}) };
+    like($@, qr/No Robot credentials/, 'post croaks without credentials');
+    eval { $robot->delete('/x') };
+    like($@, qr/No Robot credentials/, 'delete croaks without credentials');
+};
+
+subtest 'reconfigure drops cached sync client' => sub {
+    my $robot = Net::Async::Hetzner::Robot->new(user => 'a', password => 'p');
+    is($robot->_robot->user, 'a', 'initial user');
+    $robot->configure(user => 'b');
+    is($robot->_robot->user, 'b', 'new user after configure');
+};
+
 subtest '_robot creates sync client' => sub {
     my $robot = Net::Async::Hetzner::Robot->new(
         user => 'u', password => 'p',

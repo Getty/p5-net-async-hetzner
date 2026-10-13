@@ -20,6 +20,8 @@ sub configure {
 
     $self->{token}    = delete $params{token}    if exists $params{token};
     $self->{base_url} = delete $params{base_url} if exists $params{base_url};
+    # cached sync client holds the old token/URL
+    delete $self->{_cloud};
 
     $self->SUPER::configure(%params);
 }
@@ -189,7 +191,7 @@ parsing are delegated to L<WWW::Hetzner::Cloud>.
 =attr token
 
 Hetzner Cloud API token. Falls back to C<HETZNER_API_TOKEN> environment
-variable.
+variable. Requests croak if no token is available.
 
 =attr base_url
 

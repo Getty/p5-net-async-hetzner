@@ -1,6 +1,14 @@
 Revision history for Net-Async-Hetzner
 
 {{$NEXT}}
+    - Robot: get/post/put/delete now check credentials up front and croak
+      "No Robot credentials configured" instead of sending empty Basic auth
+    - Cloud/Robot: configure() drops the cached WWW::Hetzner client so new
+      token/credentials/base_url take effect
+    - cpanfile: require IO::Async::SSL (both default endpoints are https),
+      WWW::Hetzner 0.101
+    - POD: Robot post/put are form-encoded, not JSON; document croak on missing credentials
+    - Tests: expect URL-encoded query values (label_selector=env%3Dprod)
 
 0.003     2026-02-12 17:23:03Z
     - Initial release
