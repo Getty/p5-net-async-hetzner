@@ -200,4 +200,28 @@ subtest 'async error handling' => sub {
     like(($future->failure)[0], qr/Unauthorized/, 'error message');
 };
 
+subtest 'request timeout defaults to 30s and is passed to the transport' => sub {
+    my $loop = IO::Async::Loop->new;
+    my $mock_http = Test::MockAsyncHTTP->new(
+        responses => [{ status => 200, content => '{}' }],
+    );
+
+    my $robot = Net::Async::Hetzner::Robot->new(user => 'u', password => 'p');
+    $robot->{_http} = $mock_http;
+    $loop->add($robot);
+
+    is($robot->timeout, 30, 'default timeout');
+    $robot->get('/server')->get;
+    is($mock_http->requests->[0]{timeout}, 30, 'default timeout sent with request');
+
+    $robot->configure(timeout => 5);
+    is($robot->timeout, 5, 'timeout configurable');
+    $robot->get('/server')->get;
+    is($mock_http->requests->[1]{timeout}, 5, 'configured timeout sent with request');
+
+    $robot->configure(timeout => 0);
+    $robot->get('/server')->get;
+    ok(!exists $mock_http->requests->[2]{timeout}, 'timeout 0 sends no timeout');
+};
+
 done_testing;

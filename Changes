@@ -14,6 +14,8 @@ alone; coordinate both releases through a karr ticket. See CLAUDE.md and
     - cpanfile: require IO::Async::SSL (both default endpoints are https),
       WWW::Hetzner 0.102 (the sibling these tests run against)
     - Net::Async::HTTP is loaded with use instead of a late require
+    - Cloud/Robot: new `timeout` attribute (default 30s, 0 = none); stalled requests
+      now fail their Future instead of staying pending forever
     - POD: Robot post/put are form-encoded, not JSON; document croak on missing credentials
     - Tests: expect URL-encoded query values (label_selector=env%3Dprod)
 

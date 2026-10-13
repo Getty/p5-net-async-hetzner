@@ -251,4 +251,28 @@ subtest 'query arrayref becomes repeated params' => sub {
     unlike($req->uri, qr{sort%5B%5D}, 'no bracket form for query arrays');
 };
 
+subtest 'request timeout defaults to 30s and is passed to the transport' => sub {
+    my $loop = IO::Async::Loop->new;
+    my $mock_http = Test::MockAsyncHTTP->new(
+        responses => [{ status => 200, content => '{}' }],
+    );
+
+    my $cloud = Net::Async::Hetzner::Cloud->new(token => 'test-token');
+    $cloud->{_http} = $mock_http;
+    $loop->add($cloud);
+
+    is($cloud->timeout, 30, 'default timeout');
+    $cloud->get('/servers')->get;
+    is($mock_http->requests->[0]{timeout}, 30, 'default timeout sent with request');
+
+    $cloud->configure(timeout => 5);
+    is($cloud->timeout, 5, 'timeout configurable');
+    $cloud->get('/servers')->get;
+    is($mock_http->requests->[1]{timeout}, 5, 'configured timeout sent with request');
+
+    $cloud->configure(timeout => 0);
+    $cloud->get('/servers')->get;
+    ok(!exists $mock_http->requests->[2]{timeout}, 'timeout 0 sends no timeout');
+};
+
 done_testing;

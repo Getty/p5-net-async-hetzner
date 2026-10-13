@@ -22,6 +22,7 @@ sub configure {
     $self->{user}     = delete $params{user}     if exists $params{user};
     $self->{password} = delete $params{password} if exists $params{password};
     $self->{base_url} = delete $params{base_url} if exists $params{base_url};
+    $self->{timeout}  = delete $params{timeout}  if exists $params{timeout};
     # cached sync client holds the old credentials/URL
     delete $self->{_robot};
 
@@ -50,6 +51,8 @@ sub _check_auth {
 }
 
 sub base_url { $_[0]->{base_url} // 'https://robot-ws.your-server.de' }
+
+sub timeout { $_[0]->{timeout} // 30 }
 
 # Internal: sync Robot instance for request building and response parsing
 sub _robot {
@@ -94,8 +97,11 @@ sub _do_request {
     }
     $http_req->content($req->content) if $req->has_content;
 
+    # timeout 0 means none: Net::Async::HTTP would fire a 0s timer otherwise
+    my $timeout = $self->timeout;
     return $self->_http->do_request(
         request => $http_req,
+        ($timeout ? (timeout => $timeout) : ()),
     )->then(sub {
         my ($response) = @_;
         return Future->done(WWW::Hetzner::HTTPResponse->new(
@@ -201,6 +207,11 @@ environment variable.
 =attr base_url
 
 Base URL for the Robot API. Defaults to C<https://robot-ws.your-server.de>.
+
+=attr timeout
+
+Seconds after which a request fails its Future with C<timeout> (default 30,
+like L<WWW::Hetzner::LWPIO>). C<0> disables the timeout.
 
 =method get($path, %params)
 

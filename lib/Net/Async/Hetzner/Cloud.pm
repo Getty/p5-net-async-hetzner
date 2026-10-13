@@ -21,6 +21,7 @@ sub configure {
 
     $self->{token}    = delete $params{token}    if exists $params{token};
     $self->{base_url} = delete $params{base_url} if exists $params{base_url};
+    $self->{timeout}  = delete $params{timeout}  if exists $params{timeout};
     # cached sync client holds the old token/URL
     delete $self->{_cloud};
 
@@ -36,6 +37,8 @@ sub token {
             . "  Option:      token => \$token\n\n"
             . "Get token at: https://console.hetzner.cloud/ -> Select project -> Security -> API tokens\n";
 }
+
+sub timeout { $_[0]->{timeout} // 30 }
 
 sub base_url { $_[0]->{base_url} // 'https://api.hetzner.cloud/v1' }
 
@@ -81,8 +84,11 @@ sub _do_request {
     }
     $http_req->content($req->content) if $req->has_content;
 
+    # timeout 0 means none: Net::Async::HTTP would fire a 0s timer otherwise
+    my $timeout = $self->timeout;
     return $self->_http->do_request(
         request => $http_req,
+        ($timeout ? (timeout => $timeout) : ()),
     )->then(sub {
         my ($response) = @_;
         return Future->done(WWW::Hetzner::HTTPResponse->new(
@@ -196,6 +202,11 @@ variable. Requests croak if no token is available.
 =attr base_url
 
 Base URL for the Cloud API. Defaults to C<https://api.hetzner.cloud/v1>.
+
+=attr timeout
+
+Seconds after which a request fails its Future with C<timeout> (default 30,
+like L<WWW::Hetzner::LWPIO>). C<0> disables the timeout.
 
 =method get($path, %params)
 
