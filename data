@@ -1,0 +1,35 @@
+---
+class: standard
+completed: 2026-10-14T01:43:10Z
+created: 2026-10-06T19:44:32Z
+id: 6
+priority: medium
+started: 2026-10-13T20:54:23Z
+status: done
+tags:
+- hygiene
+- branch
+- tests
+- review-2026-10-06
+title: Branch agent-phase2 (cards k1-k5, done) was never merged into main
+updated: 2026-10-14T01:43:10Z
+---
+
+Cards k1-k5 are `done`, but their five commits exist only on the local branch `agent-phase2` (`git log --oneline main..agent-phase2`):
+
+    ed32873 Changes: record the WWW::Hetzner joint-release coupling (karr #3)
+    509942d cpanfile: declare test-only deps, drop runtime IO::Async::Loop (karr #2)
+    c5fbeb0 tests: regression-cover Robot form-encoding, prove Cloud stays JSON (karr #4)
+    78008ec tests: regression-cover query URI-encoding and array multi-values (karr #5)
+    4029c41 tests: extract shared Test::MockAsyncHTTP into t/lib (karr #1)
+
+`main` is 9 chore commits ahead of the branch and still has the old state: no `t/lib/`, `cpanfile` without the test deps, empty `{{$NEXT}}` in `Changes`. `git diff --stat main...agent-phase2` touches `Changes`, `cpanfile`, `t/cloud.t`, `t/robot.t`, `t/lib/Test/MockAsyncHTTP.pm` only, so a merge should be conflict-free. No open card tracks the landing.
+
+Done when: the branch is merged (or rebased) onto main, the offline suite is green there, and the branch is deleted.
+
+---
+Fleet review 2026-10-06 · kind: hygiene · confidence: verified
+
+2026-10-13 20:55 Branch agent-phase2 was NOT conflict-free: 93d1d4d touched t/cloud.t (same 'get with query params' subtest); resolved by taking the branch side (superset). Rebased onto local main 93d1d4d, 5 commits now f198f97..1b8d632 on branch worktree-k6-k8-k9 (not merged into main, no push); agent-phase2 deleted. prove -lr -I../p5-www-hetzner/lib t: 3 files, 27 tests PASS. Open: fast-forward main to worktree-k6-k8-k9 is the maintainer's call.
+
+2026-10-13 20:55 Branch rebased onto main and offline suite green (see note); landing on main left to maintainer.
