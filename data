@@ -1,0 +1,27 @@
+---
+class: standard
+completed: 2026-10-14T01:43:15Z
+created: 2026-10-06T19:44:41Z
+id: 8
+priority: medium
+started: 2026-10-13T20:54:23Z
+status: done
+tags:
+- hygiene
+- cpanfile
+- tls
+- review-2026-10-06
+title: 'cpanfile: IO::Async::SSL is missing although both default endpoints are https'
+updated: 2026-10-14T01:43:15Z
+---
+
+`base_url` defaults to `https://api.hetzner.cloud/v1` (`lib/Net/Async/Hetzner/Cloud.pm:37`) and `https://robot-ws.your-server.de` (`Robot.pm`), and Net::Async::HTTP needs IO::Async::SSL for https, loading it only at connect time. `cpanfile` lists neither `IO::Async::SSL` nor `IO::Socket::SSL`; Net::Async::HTTP itself does not pull it in as a hard dependency. A fresh install of this dist cannot make a single request against the real API.
+
+Also in `cpanfile`: `WWW::Hetzner` has no minimum version although the code depends on `_build_request`/`_parse_response`/`HTTPResponse` and on the Robot form encoding of the current sibling; and `Net::Async::HTTP` is loaded with a late `require` (`Cloud.pm:52`) for no reason.
+
+Done when: `requires 'IO::Async::SSL', '0.12'` is in `cpanfile`, `WWW::Hetzner` carries the version of the sibling the tests run against, and (optional) the up-front check from `Net::Async::MikroTik::_ssl_problem` is adopted.
+
+---
+Fleet review 2026-10-06 · kind: hygiene · confidence: verified
+
+2026-10-13 20:55 IO::Async::SSL 0.12 was already in cpanfile via 93d1d4d (cpanfile line 'requires IO::Async::SSL'). Added in this branch: WWW::Hetzner pinned 0.102 (version of sibling tree p5-www-hetzner, its next release; code relies on its non-JSON error body handling), Net::Async::HTTP now 'use' instead of late require in Cloud.pm/Robot.pm. Optional MikroTik-style _ssl_problem up-front check NOT adopted (card marks it optional; would add a runtime IO::Async::SSL load check — maintainer decision). prove: 27 tests PASS.
