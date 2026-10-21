@@ -23,6 +23,24 @@ The two client classes are near-identical twins; the only real differences are t
 inputs (`token` vs `user`/`password`) and which sync class they wrap. Keep them in
 lockstep — a fix to one almost always applies to the other.
 
+## The delegation model — why the main agent delegates
+
+Three roles: `net-async-hetzner-worker` (implement, refactor, debug),
+`net-async-hetzner-test-writer` (tests), `net-async-hetzner-release-manager` (commit,
+`Changes`, card → done, pre-release audit). All three get their skills force-loaded via
+`briefing.skills`. The orchestrating main agent gets **no briefing** — it coordinates,
+inspects, plans, reviews diffs, runs tests and edits non-behavioral docs, and delegates
+anything behavior-relevant here. Reason: only the briefed agents see the Cloud/Robot twin
+invariant and the `WWW::Hetzner` delegation contract in context; an unbriefed hand inside
+`lib/` would break exactly those. When in doubt, delegate.
+
+Behavior-relevant = runtime behavior, the public API, the async transport seam
+(`_do_request`/`_http`), the `WWW::Hetzner` delegation, the Future contract, IO::Async
+wiring, error propagation, tests. Pure prose docs, the changelog and README are not.
+
+The full karr command surface is in skill `kanban-issues-karr-coordination`; the rules
+file only fixes the board and the rules of play.
+
 ## Tech baseline
 
 - **`parent 'IO::Async::Notifier'`** — plain Perl OO, **no Moo** in this distribution
