@@ -4,26 +4,17 @@ package Net::Async::Hetzner::Cloud;
 
 use strict;
 use warnings;
-use parent 'IO::Async::Notifier';
+use parent 'Net::Async::Hetzner::Base';
 
 use Carp qw(croak);
-use Future;
-use URI;
-use HTTP::Request;
-use Net::Async::HTTP;
 use WWW::Hetzner::Cloud;
-use WWW::Hetzner::HTTPResponse;
 
 our $VERSION = '0.004';
 
 sub configure {
     my ($self, %params) = @_;
 
-    $self->{token}    = delete $params{token}    if exists $params{token};
-    $self->{base_url} = delete $params{base_url} if exists $params{base_url};
-    $self->{timeout}  = delete $params{timeout}  if exists $params{timeout};
-    # cached sync client holds the old token/URL
-    delete $self->{_cloud};
+    $self->{token} = delete $params{token} if exists $params{token};
 
     $self->SUPER::configure(%params);
 }
@@ -38,109 +29,18 @@ sub token {
             . "Get token at: https://console.hetzner.cloud/ -> Select project -> Security -> API tokens\n";
 }
 
-sub timeout { $_[0]->{timeout} // 30 }
-
-sub base_url { $_[0]->{base_url} // 'https://api.hetzner.cloud/v1' }
+sub _default_base_url { 'https://api.hetzner.cloud/v1' }
 
 # Internal: sync Cloud instance for request building and response parsing
-sub _cloud {
+sub _new_sync {
     my ($self) = @_;
-    $self->{_cloud} //= WWW::Hetzner::Cloud->new(
+    WWW::Hetzner::Cloud->new(
         token    => $self->token,
         base_url => $self->base_url,
     );
 }
 
-# Internal: Net::Async::HTTP instance
-sub _http {
-    my ($self) = @_;
-    unless ($self->{_http}) {
-        $self->{_http} = Net::Async::HTTP->new(
-            user_agent => 'Net-Async-Hetzner/' . $VERSION,
-            max_connections_per_host => 0,
-        );
-    }
-    return $self->{_http};
-}
-
-sub _add_to_loop {
-    my ($self, $loop) = @_;
-    $self->add_child($self->_http);
-}
-
-# ============================================================================
-# ASYNC HTTP TRANSPORT
-# ============================================================================
-
-sub _do_request {
-    my ($self, $req) = @_;
-
-    my $uri = URI->new($req->url);
-
-    my $http_req = HTTP::Request->new($req->method => $uri);
-    my $headers = $req->headers;
-    for my $key (keys %$headers) {
-        $http_req->header($key => $headers->{$key});
-    }
-    $http_req->content($req->content) if $req->has_content;
-
-    # timeout 0 means none: Net::Async::HTTP would fire a 0s timer otherwise
-    my $timeout = $self->timeout;
-    return $self->_http->do_request(
-        request => $http_req,
-        ($timeout ? (timeout => $timeout) : ()),
-    )->then(sub {
-        my ($response) = @_;
-        return Future->done(WWW::Hetzner::HTTPResponse->new(
-            status  => $response->code,
-            content => $response->decoded_content // $response->content // '',
-        ));
-    });
-}
-
-# ============================================================================
-# ASYNC API METHODS - all return Futures
-# ============================================================================
-
-sub get {
-    my ($self, $path, %params) = @_;
-    my $cloud = $self->_cloud;
-    my $req = $cloud->_build_request('GET', $path, %params);
-    return $self->_do_request($req)->then(sub {
-        my ($response) = @_;
-        return Future->done($cloud->_parse_response($response, 'GET', $path));
-    });
-}
-
-sub post {
-    my ($self, $path, $data) = @_;
-    my $cloud = $self->_cloud;
-    my $req = $cloud->_build_request('POST', $path, body => $data);
-    return $self->_do_request($req)->then(sub {
-        my ($response) = @_;
-        return Future->done($cloud->_parse_response($response, 'POST', $path));
-    });
-}
-
-sub put {
-    my ($self, $path, $data) = @_;
-    my $cloud = $self->_cloud;
-    my $req = $cloud->_build_request('PUT', $path, body => $data);
-    return $self->_do_request($req)->then(sub {
-        my ($response) = @_;
-        return Future->done($cloud->_parse_response($response, 'PUT', $path));
-    });
-}
-
-sub delete {
-    my ($self, $path) = @_;
-    my $cloud = $self->_cloud;
-    my $req = $cloud->_build_request('DELETE', $path);
-    return $self->_do_request($req)->then(sub {
-        my ($response) = @_;
-        return Future->done($cloud->_parse_response($response, 'DELETE', $path));
-    });
-}
+sub _cloud { $_[0]->_sync }
 
 1;
 
