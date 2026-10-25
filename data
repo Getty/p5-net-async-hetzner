@@ -1,0 +1,33 @@
+---
+claimed_at: 2026-10-25T02:53:28Z
+claimed_by: worker
+class: standard
+completed: 2026-10-25T02:53:28Z
+created: 2026-10-06T19:44:46Z
+id: 9
+priority: low
+started: 2026-10-13T20:54:23Z
+status: done
+tags:
+- async
+- drift
+- coverage
+- review-2026-10-06
+title: 'Storage API (api.hetzner.com): Net::Async::Hetzner::Storage + gemeinsame Transport-Basis
+  (Timeout ist gebaut)'
+updated: 2026-10-25T02:53:28Z
+---
+
+Two gaps against the sync sibling, both visible in `lib/Net/Async/Hetzner/Cloud.pm:49-59`:
+
+1. `_http` builds Net::Async::HTTP without `timeout`, and `configure` (`Cloud.pm:18-25`) accepts only `token`/`base_url` (`user`/`password` for Robot). A stalled connection keeps the Future pending forever; `WWW::Hetzner::LWPIO` defaults to 30 s. A cached `_cloud`/`_robot` also means `configure(token => ...)` after the first request has no effect on what is sent.
+2. WWW::Hetzner 0.101 added `WWW::Hetzner::Storage` (Storage Boxes, third API host). There is no `Net::Async::Hetzner::Storage`; `grep -ri storage lib README.md` is empty. `Cloud.pm` and `Robot.pm` are line-for-line copies apart from auth (see `diff`), so a shared base class would make the third client a few lines.
+
+Done when: `timeout` is configurable with a 30 s default, reconfiguring credentials drops the cached sync client, and `Net::Async::Hetzner::Storage` exists on a shared transport base with a mock test like `t/cloud.t`.
+
+---
+Fleet review 2026-10-06 · kind: improvement · confidence: verified
+
+2026-10-13 20:55 Built: configurable timeout (default 30s, 0=none) in Cloud+Robot, passed per request to Net::Async::HTTP; tests in t/cloud.t,t/robot.t (red on old lib: no timeout method). Reconfigure dropping cached client was already done in 93d1d4d. NOT built, maintainer decision: Net::Async::Hetzner::Storage + shared transport base. Recommendation: extract Net::Async::Hetzner::Base (configure/_http/_add_to_loop/_do_request/verbs; subclasses supply _sync client + auth) as its own card, then Storage as a ~30 line subclass; WWW::Hetzner::Storage exists in the 0.102 sibling tree; refactor touches both twins so should go with the joint WWW::Hetzner release. Card should stay open for that part.
+
+Commits: fc9b85b (Base, Cloud/Robot umgestellt), 8612113 (Storage). cpanfile bleibt bei WWW::Hetzner 0.102: Storage kam mit 0.101 (Sibling-Changes), 0.102 deckt es ab. Storage hat eigenes _check_auth, weil WWW::Hetzner::Storage den Token-Check per 'around _request' macht, den der Async-Pfad (_build_request direkt) umgeht. _cloud/_robot bleiben als Alias auf _sync. Also found: Sibling Storage.pm traegt VERSION 0.103, Changes dort fuehrt 0.102 als letzten Release (Stand der Sibling-Arbeitskopie).
