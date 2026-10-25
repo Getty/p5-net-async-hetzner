@@ -7,5 +7,6 @@ use Test::More;
 use_ok('Net::Async::Hetzner');
 use_ok('Net::Async::Hetzner::Cloud');
 use_ok('Net::Async::Hetzner::Robot');
+use_ok('Net::Async::Hetzner::Storage');
 
 done_testing;

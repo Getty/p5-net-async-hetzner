@@ -11,6 +11,8 @@ alone; coordinate both releases through a karr ticket. See CLAUDE.md and
       (configure, timeout, HTTP, request cycle, verbs); a client for another
       API host only supplies its WWW::Hetzner client and credentials. The
       public interface of Cloud and Robot is unchanged
+    - New: Net::Async::Hetzner::Storage, async client for the Storage Box API
+      (api.hetzner.com) over WWW::Hetzner::Storage
     - Robot: get/post/put/delete now check credentials up front and croak
       "No Robot credentials configured" instead of sending empty Basic auth
     - Cloud/Robot: configure() drops the cached WWW::Hetzner client so new

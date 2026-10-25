@@ -73,6 +73,19 @@ my $data = $robot->get('/server/123456')->get;
 print $data->{server}{server_name}, "\n";
 ```
 
+## Storage Box API
+
+```perl
+use Net::Async::Hetzner::Storage;
+
+my $storage = Net::Async::Hetzner::Storage->new(
+    token => $ENV{HETZNER_API_TOKEN},
+);
+$loop->add($storage);
+
+my $boxes = $storage->get('/storage_boxes')->get;
+```
+
 ## API Methods
 
 All methods return [Future](https://metacpan.org/pod/Future) objects.

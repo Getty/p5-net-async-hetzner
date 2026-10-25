@@ -68,11 +68,14 @@ are available.
 
 =item * L<Net::Async::Hetzner::Robot> - Hetzner Robot API (dedicated servers)
 
+=item * L<Net::Async::Hetzner::Storage> - Hetzner Storage Box API
+
 =back
 
 =head1 SEE ALSO
 
 L<Net::Async::Hetzner::Cloud>, L<Net::Async::Hetzner::Robot>,
+L<Net::Async::Hetzner::Storage>,
 L<WWW::Hetzner>, L<IO::Async>, L<Future>
 
 =cut
