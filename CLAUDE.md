@@ -10,7 +10,8 @@ transport seam and the mock-notifier test pattern are documented in the
 ## Delegation
 
 Delegate behavior-relevant code to the right agent instead of touching it yourself — the
-principle, the delegation lock and the release rule are in
+delegation lock and the publish gate are shared house rules (skilletor bundle
+`getty-cpan-dist@getty`); lanes, the release coupling and hazards are in
 `.claude/rules/net-async-hetzner-rules.md`.
 
 | Task | Agent |
