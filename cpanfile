@@ -1,17 +1,16 @@
 requires 'perl', '5.020';
 
+requires 'Future', '0.47';
+requires 'HTTP::Request';
 requires 'IO::Async', '0.80';
 requires 'IO::Async::Notifier';
-requires 'Net::Async::HTTP', '0.49';
-requires 'Future', '0.47';
-requires 'URI';
-requires 'HTTP::Request';
-
-requires 'WWW::Hetzner', '0.102';
 requires 'IO::Async::SSL', '0.12';
+requires 'Net::Async::HTTP', '0.49';
+requires 'URI';
+requires 'WWW::Hetzner', '0.102';
 
 on test => sub {
-    requires 'Test::More', '0.98';
-    requires 'IO::Async::Loop';
     requires 'HTTP::Response';
+    requires 'IO::Async::Loop';
+    requires 'Test::More', '0.98';
 };
