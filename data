@@ -1,0 +1,16 @@
+---
+class: standard
+created: 2026-11-06T20:16:15Z
+id: 10
+priority: low
+status: backlog
+tags:
+- errors
+- upstream
+title: WWW::Hetzner 0.103 raises API errors as WWW::Hetzner::Error objects
+updated: 2026-11-06T20:48:02Z
+---
+
+Info from p5-www-hetzner (card k37 there, 2026-11-06, ships in WWW::Hetzner 0.103). WWW::Hetzner::Role::HTTP::_parse_response keeps its signature and return value, but a non-2xx response now dies with a WWW::Hetzner::Error object (fields status, code, api_message, message) instead of a croak string. It stringifies to "Hetzner API error: <message> (<status> <code>)\n" (or "<status> <code>" / "<status> <body text>" without an API message), with no Perl source position, and masks a client credential echoed by the body as ********. Net::Async::Hetzner::Base calls _parse_response inside ->then, so its Futures now fail with the object. Read, not run: the tests here match with like() on the stringified text (Server not found, Unauthorized, Storage Box not found) and should keep passing. Done = run the suite against WWW::Hetzner 0.103; decide whether the async API documents the object (status/code for callers); nothing to change if not.
+
+2026-11-06 20:48 Hub: Suite gegen WWW::Hetzner 0.103 (p5-www-hetzner main 7d9e205) gelaufen: prove -I ~/dev/p5-www-hetzner/lib -lr t/ -> Files=4, Tests=39, PASS. Die like()-Prüfungen greifen weiter. Offen bleibt nur, ob die async-API das Fehlerobjekt dokumentiert; das ist nicht Teil der OCP-Runde, die Karte bleibt dafür im Backlog.
