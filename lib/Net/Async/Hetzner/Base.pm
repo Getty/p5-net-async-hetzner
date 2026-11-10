@@ -161,6 +161,22 @@ Base URL of the API. Defaults to the subclass's C<_default_base_url>.
 Seconds after which a request fails its Future with C<timeout> (default 30,
 like L<WWW::Hetzner::LWPIO>). C<0> disables the timeout.
 
+=head1 ERRORS
+
+A non-2xx response fails the Future with a L<WWW::Hetzner::Error> object,
+the same one the sync client throws. It carries C<status> (HTTP status),
+C<code> (the API's error code, if any), C<api_message> (the API's message,
+if any) and C<message> (the full text). Stringified it reads
+C<Hetzner API error: E<lt>messageE<gt> (E<lt>statusE<gt> E<lt>codeE<gt>)>, so
+matching the text keeps working:
+
+    $client->get('/servers/999')->on_fail(sub {
+        my ($error) = @_;
+        warn "not found" if ref $error && $error->status == 404;
+    });
+
+Failures that are not API errors, such as a timeout, are not this object.
+
 =method get($path, %params)
 
     my $f = $client->get('/servers', params => { label_selector => 'env=prod' });

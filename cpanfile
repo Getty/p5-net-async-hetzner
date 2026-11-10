@@ -7,7 +7,7 @@ requires 'IO::Async::Notifier';
 requires 'IO::Async::SSL', '0.12';
 requires 'Net::Async::HTTP', '0.49';
 requires 'URI';
-requires 'WWW::Hetzner', '0.102';
+requires 'WWW::Hetzner', '0.103';
 
 on test => sub {
     requires 'HTTP::Response';

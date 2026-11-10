@@ -24,6 +24,10 @@ alone; coordinate both releases through a karr ticket. See CLAUDE.md and
       now fail their Future instead of staying pending forever
     - POD: Robot post/put are form-encoded, not JSON; document croak on missing credentials
     - Tests: expect URL-encoded query values (label_selector=env%3Dprod)
+    - Errors: a non-2xx response fails the Future with a WWW::Hetzner::Error
+      object (status, code, api_message, message; stringifies to the former
+      text), documented in Net::Async::Hetzner::Base; requires WWW::Hetzner
+      0.103
 
 0.003     2026-02-12 17:23:03Z
     - Initial release

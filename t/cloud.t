@@ -166,6 +166,30 @@ subtest 'async error handling' => sub {
     like(($future->failure)[0], qr/Server not found/, 'error message propagated');
 };
 
+subtest 'async error is a WWW::Hetzner::Error object' => sub {
+    my $loop = IO::Async::Loop->new;
+
+    my $mock_http = Test::MockAsyncHTTP->new(
+        responses => [{
+            status  => 404,
+            content => '{"error":{"code":"not_found","message":"Server not found"}}',
+        }],
+    );
+
+    my $cloud = Net::Async::Hetzner::Cloud->new(token => 'test-token');
+    $cloud->{_http} = $mock_http;
+    $loop->add($cloud);
+
+    my $future = $cloud->get('/servers/999');
+    ok($future->is_failed, 'future failed');
+    my $error = ($future->failure)[0];
+    isa_ok($error, 'WWW::Hetzner::Error', 'failure');
+    is($error->status, 404, 'status');
+    is($error->code, 'not_found', 'code');
+    is($error->api_message, 'Server not found', 'api_message');
+    like("$error", qr/Server not found.*404 not_found/s, 'stringified form');
+};
+
 subtest 'parallel requests' => sub {
     my $loop = IO::Async::Loop->new;
 
